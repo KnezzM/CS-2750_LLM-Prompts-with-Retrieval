@@ -1,0 +1,60 @@
+<<SYS>>
+You are a transportation engineer classifying SUBCATEGORIES.
+
+Do your reasoning on a hidden scratchpad:
+- Extract key phrases (entities, facilities, actions, problems).
+- Map phrases to candidate CATEGORIES.
+- For each candidate CATEGORY, score each allowed subcategory by:
+  (a) lexical cue overlap,
+  (b) semantic match with EVIDENCE_TOPK snippets,
+  (c) fit to the short definition.
+- Apply SUPPORT_BY_CATEGORY only as a weak prior (use it to break ties or confirm).
+
+Constraints (must hold in the final lines):
+- You will receive ONE candidate CATEGORIY.
+- SUBCATEGORY of provided CATEGORY must be DISTINCT and come from allowed list.
+- If best match is outside the provided allowed lists, choose 'Other' within the most appropriate candidate category.
+- Use exact label strings as provided (no synonyms, no typos).
+
+Be concise and deterministic. Never add extra commentary outside the required lines.
+<<END SYS>>
+
+---
+
+COMMENT: "The speed of travel through the residential and business district along Route 30 through Forest HIlls is hazardous. The DOT timing of the lights to expedite movement at speed from Turtle Creek area to the interstate highway poses significant disincentives"
+
+SUPPORT_BY_SUBCATEGORY:
+Safety & Vulnerable Users=1.441 (79.7%) | Congestion=0.210 (11.6%) | Intersection & Signals=0.157 (8.7%)
+
+68.13% >= 10%
+
+Margin difference = True
+
+EVIDENCE_TOPK:
+[Rank | sim | eff_sim | CATEGORY | SUBCATEGORY | Snippet]
+1 | 1.000 | 1.000 | Roadway | Safety & Vulnerable Users | "The speed of travel through the residential and business district along Route 30 through Forest HIlls is hazardous. The DOT timing of the li"
+2 | 0.632 | 0.316 | Roadway | Safety & Vulnerable Users | "An increasing amount of traffic accidents are occurring along this corridor due to excessive speeding by drivers.  This is not safe for othe"
+3 | 0.629 | 0.210 | Roadway | Congestion | "Street access offon an interstate highway causes traffic to slow and the flow to be interrupted."
+4 | 0.627 | 0.157 | Roadway | Intersection & Signals | "Intersection is always congested turning lanes are too short traffic signals are confusing ramps entering and exiting Route 30 are too short"
+5 | 0.627 | 0.125 | Roadway | Safety & Vulnerable Users | "Constant speeding headed past neighborhoods in Rebecca Dr  Change speed to 25 and patrol please"
+
+CANDIDATE_CATEGORIES AND ALLOWED SUBCATEGORIES:
+- Roadway
+  * Intersection & Signals: Issues with Intersections, Traffic signals, Turn-lanes, Signange
+  * Congestion: General problems with congestion and traffic, merging, roadways that do not connect well
+  * Maintenance: Road in need of repair, drainange issues, shoulder issues, bridge closed, potwholes
+  * Safety & Vulnerable Users: traffic accidents, speed limit concerns, bike/pedestrina access issues
+  * Other: unclear or mixed
+
+DECISION POLICY:
+1) Rank the best and second-best subcategory for EACH listed category using the scoring rubric above.
+2) If SUPPORT shows a ≥10% margin for one subcategory, treat it as a weak prior only—override it if text cues clearly favor a different (Category :: Subcategory).
+3) If ambiguous, use 'Other' within the best candidate category.
+
+Output format (exactly these lines; no extra text):
+CATEGORY: Roadway
+PRED_SUBCATEGORY: <name>
+Reason: <1–2 short sentences citing the key phrase(s)>
+
+
+ <END>
